@@ -1,6 +1,5 @@
 require "./config/environment"
 require "./app/models/user"
-require 'pry'
 
 class ApplicationController < Sinatra::Base
 
@@ -33,6 +32,20 @@ class ApplicationController < Sinatra::Base
   get '/account' do
     @user = User.find(session[:user_id])
     erb :account
+  end
+  
+  patch '/account' do
+    @user = User.find(session[:user_id])
+    @amount = params["amount"].to_f
+    if params["deposit"]
+      @user.balance += @amount
+    elsif params["withdraw"]
+      if @user.balance >= @amount
+        @user.balance -= @amount
+      end
+    end
+    @user.save    
+    redirect '/account'
   end
 
 
